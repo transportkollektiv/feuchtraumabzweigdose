@@ -1,0 +1,93 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage[margin=1in]{geometry}
+\usetikzlibrary{positioning,fit,calc,arrows}
+
+
+\begin{document}
+\begin{centering}
+    \LARGE Circuit description Feuchtraumabzweigdose pcb\\
+    \Large a prototyping playground for open bike project\\
+    \large spacecarrot, feb 20
+\end{centering}
+\section{Power Section}
+The board can be directly supplied from any 3.3Vdc/500mA source. There's also some optional sections to efficiently interface with a Li+ battery. Here's a flowchart:
+
+\begin{figure}[h]
+    \centering
+\begin{tikzpicture}
+    \draw
+        node[align=center,draw,minimum width=2.7cm,minimum height=1.2cm] (rect) {Rectifier\\ \& Filter}
+
+        node[align=center,draw,below=of rect,minimum width=2.7cm,minimum height=1.2cm] (ldo) {Widerange LDO}
+        node[align=center,draw,below=of ldo,minimum width=2.7cm,minimum height=1.2cm] (charge) {Charge\\Controller}
+        node[align=center,draw,below=of charge,minimum width=2.7cm,minimum height=1.2cm] (supply) {Supply LDO}
+        node[align=center,draw,below=of supply,minimum width=2.7cm,minimum height=1.2cm] (switch) {$V_{ext}$ Switch}
+
+        node[dotted,align=center,draw,left=2cm of rect,minimum width=2.5cm,minimum height=1cm] (dyn) {Dynamo}
+        node[dotted,align=center,draw,left=2cm of charge,minimum width=2.5cm,minimum height=1cm] (batt) {Li+ Battery\\single cell}
+        node[dotted,align=center,draw,left=2cm of switch,minimum width=2.5cm,minimum height=1cm] (vext) {$V_{ext}$}
+        node[dotted,align=center,draw,above=0.3cm of vext,minimum width=2.5cm,minimum height=1cm] (vcc) {$V_{CC}$}
+
+        node[align=left,right=1cm of rect] {probably heats up\\a bit above 20Vac}
+        node[align=left,right=1cm of supply] {25uA quiescent current\\1A max output current}
+        node[align=left,right=1cm of ldo] {safe overload up to 40Vdc\\shuts off above 18Vdc}
+        node[align=left,right=1cm of charge] {programmable charge current\\and charge termination\\/!\textbackslash WARNING:\\unprotected without LDO}
+        node[align=left,right=1cm of switch] {max output current}
+
+        node[right=0cm of dyn,align=left,anchor=south west] {\small 6-12Vdc}
+        node[right=0cm of dyn,align=left,anchor=north west] {\small 6-19Vdc}
+        node[above=0cm of ldo,anchor=south west] {\small 5-18Vdc}
+        node[below=0cm of ldo,anchor=north west] {\small 5Vdc}
+
+        node[above=0cm of charge,anchor=south west] {\small 4.2-6Vdc}
+        node[above=0cm of supply,anchor=south west] {\small 3.7-5.5Vdc}
+        node[below=0cm of supply,anchor=north west] {\small 3.3Vdc}
+    ;
+    \draw [->] (rect)-- (ldo);
+    \draw [->] (ldo)-- (charge);
+    \draw [->] (supply)-- (switch);
+
+    \draw[->,dotted] (dyn)-- (rect);
+    \draw[->,dotted] (charge)-- (batt);
+    \draw[->,dotted] (supply)|- (vcc);
+    \draw[->,dotted] (switch)-- (vext);
+    \draw[->,dotted] (batt)|- ++(0,-1)-| (supply);
+\end{tikzpicture}
+    \caption{Dependency Flowchart}
+\end{figure}
+
+\clearpage
+
+\subsection{Rectifier \& Filter}
+Due to space limitations, there is no filter coil, but the inductance of the dynamo itself should suffice to provide reasonably low ripple at average driving speed. By adjusting the charge current of the charge controller ripple can be further reduced if necessary. A 22V Zener clamps with a reasonable safety ratio to the 35V electrolyte.
+\newline \newline
+BOM: D1
+
+\subsection{Wide range ldo}
+blub
+\newline \newline
+BOM: U3, C2, D2
+
+\subsection{Charge controller}
+The charge controller takes anything between $V_{batt}$+0.3V to 6V and charges a single cell Li+ battery in constant current mode for $V_{batt}<$4.2V, then switches to constant voltage mode and finally terminates the charge when the charge current drops to prolong the lifetime of the battery.\newline
+The charge current during the constant current phase and charge termination current can be programmed in tandem with R2.
+\newline \newline
+EXPLOSION WARNING: If a voltage above 6V is applied the internal controller is somewhat undefined and might let more through then you might want on a Li+, so be really sure your source is safe. If you want additional protection, look into the next section.
+\newline \newline
+BOM: C4,R2,C3,U4
+
+\subsection{Supply LDO}
+the digital section has a single 3.3Vdc power supply.  from an unstabilized 3.7-5.5V source like a li+ battery. If 3.3V are externally supplied via the $VCC$ header, R3, R7 and U5 should be omitted. 
+The quiescent current is dominated by the ldo with 25$\mu$A.
+
+\section{Interfaces}
+\subsection{Dynamo wakeup}
+The charge controller sends its binary state to pin (LOOKTHISUP). Additionally, a trimmable comparator can detect lower voltages at the input of the wide range ldo and send a wakeup signal on slight movement. The trim range by default is 0-7.35V, when a lower range is desired for better adjustment R6 can be increased to 470k for a range of 0-1V. This section adds a total of (LOOKTHISUP) to the quiescent current of VCC.
+\newline \newline
+BOM: R8,R6,D3,R10,RV1,U6
+
+\end{document}
+
