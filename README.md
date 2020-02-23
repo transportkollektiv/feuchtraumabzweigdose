@@ -4,7 +4,7 @@ This PCB is meant to function as an experimental playground for the [OpenBike](h
 
 All in all it is an attempt to migrate most of the functionality of a TTGO T-Beam while being able to run days or weeks on end on one 18650 cell while mostly being in deep sleep. The T-Beam will usually deplete the cell within 30 hours.
 
-For full functional documentation see [`docs/feuchtraumabzweigdose.pdf`](docs/feuchtraumabzweigdose-docs.pdf).
+For full functional documentation see [`docs/feuchtraumabzweigdose_docs.pdf`](docs/feuchtraumabzweigdose_docs.pdf).
 
 The project is named Feuchtraumabzweigdose because it is meant to fit snugly into a waterproof junction box – or Feuchtraumabzweigdose in German :D
 
