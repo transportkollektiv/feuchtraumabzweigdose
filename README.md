@@ -18,3 +18,7 @@ The project is named Feuchtraumabzweigdose because it is meant to fit snugly int
 * The voltage divider that is meant to be read by the ADC is 1:10, which brings down the measurable range of values quite a bit. Replace R3 with a 1M resistor to bring it down to a simple 1:1 divider, but this also increases the power draw during deep sleep.
 * The 10k resistor at the MCP73832's `PROG` pin (R2) limits charging current to 100mA. ~Might want to replace this with maybe a 2k resistor (500 mA) or something in between~ This should not be increased too much
 * in v0.1, the MOSFET switching the external power for the GPS (Q1) has pins 2 and 3 switched. A quick fix is to rotate it 180 degrees and switch the Source and Drain pins, then connect the Gate pin to one pad of the unpopulated C1 at the R1/R5 junction. See [this image for reference.](docs/botch-q1.jpg)
+
+## Firmware
+
+See [stadtulm/feuchtraumabzweigdose-testing](https://github.com/stadtulm/feuchtraumabzweigdose-testing)
